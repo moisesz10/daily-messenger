@@ -70,11 +70,26 @@ export function deactivateUser(email) {
     });
 }
 
-export function logSent(user_id, status, info = '') {
+export function logSent(userId, status, info) {
     return new Promise((resolve, reject) => {
-        db.run('INSERT INTO sent_logs (user_id, status, info) VALUES (?, ?, ?)', [user_id, status, info], function (err) {
+        db.run(`INSERT INTO sent_logs (user_id, status, info) VALUES (?, ?, ?)`, [userId, status, info], function (err) {
             if (err) reject(err);
             else resolve(this.lastID);
+        });
+    });
+}
+
+export function getMessageLogs(limit = 50) {
+    return new Promise((resolve, reject) => {
+        db.all(`
+            SELECT l.id, l.status, l.info, l.sent_at, u.name, u.email 
+            FROM sent_logs l
+            JOIN users u ON l.user_id = u.id
+            ORDER BY l.sent_at DESC
+            LIMIT ?
+        `, [limit], (err, rows) => {
+            if (err) reject(err);
+            else resolve(rows);
         });
     });
 }

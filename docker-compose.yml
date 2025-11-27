@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data.db:/app/data.db
+    environment:
+      - PORT=3000
+      - DB_PATH=./data.db
+      - ADMIN_SECRET=admin123
